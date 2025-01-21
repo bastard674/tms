@@ -9,10 +9,7 @@ import javax.persistence.*;
 @Table(name="course")
 public class Course {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String coursename;  // Renamed to follow camel case convention
+
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)  // Default is LAZY, change to EAGER if needed
     private List<Students> students;
