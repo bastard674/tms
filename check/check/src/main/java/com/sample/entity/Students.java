@@ -7,7 +7,15 @@ import com.sample.entity.Course;
 @Table(name="Students")
 public class Students {
 
-    @Id
+    public Users getUser() {
+		return user;
+	}
+
+	public void setUser(Users user) {
+		this.user = user;
+	}
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -17,6 +25,11 @@ public class Students {
     @ManyToOne(fetch = FetchType.LAZY)  // You can change to EAGER if needed
     @JoinColumn(name="course_id",referencedColumnName = "id")
     private Course course;
+    
+    @OneToOne
+    @JoinColumn(name = "user_id")  // Foreign key column in the Admin table
+    private Users user;
+    
 
     public String getPassword() {
 		return password;

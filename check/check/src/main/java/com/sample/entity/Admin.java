@@ -9,7 +9,13 @@ import javax.persistence.*;
 @Table(name="admin")
 public class Admin {
 
-    public Long getId() {
+    public Users getUser() {
+		return user;
+	}
+	public void setUser(Users user) {
+		this.user = user;
+	}
+	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
@@ -53,6 +59,9 @@ public class Admin {
     String Address;
     String Aadhar;
     String Gender;
+    @OneToOne
+    @JoinColumn(name = "user_id")  // Foreign key column in the Admin table
+    private Users user;
     
     
 }

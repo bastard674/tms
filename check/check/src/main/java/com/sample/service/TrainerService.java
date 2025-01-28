@@ -34,9 +34,8 @@ public class TrainerService {
 	private Remo studentdb;
 	
 	
-	public void addinfo(String name,Long courseId) {
-		String sql = "INSERT INTO trainer (name,course_id) VALUES (?, ?)";
-		jdbc.update(sql, name, courseId);
+	public void addinfo(Trainer trainer) {
+		trainerdb.save(trainer);
 	}
 	
 	public Trainer checkdetails(String username,String password,String role) {

@@ -2,6 +2,8 @@ package com.sample.controler;
 
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,7 +17,9 @@ import com.sample.entity.Admin;
 import com.sample.entity.Course;
 import com.sample.entity.Login;
 import com.sample.entity.Trainer;
+import com.sample.entity.Users;
 import com.sample.repository.CourseDb;
+import com.sample.repository.UsersDb;
 import com.sample.service.AdminService;
 import com.sample.service.CourseService;
 import com.sample.service.LoginService;
@@ -41,8 +45,19 @@ public class AdminControler{
 	@Autowired
 	private AdminService adminservice;
 	
+	@Autowired 
+	private UsersDb usersdb;
+	
 	@GetMapping("/admindashboard")
-	public String admindashboard(Model m1) {
+	public String admindashboard(HttpSession http,Model m1) {
+		
+		Long userId = (Long) http.getAttribute("userId");
+		
+		if(userId == null) {
+			return "redirect:/tmslogin";
+		}
+		
+		m1.addAttribute("userId", userId);
 		return "admindashboard";
 	}
 	
@@ -61,35 +76,40 @@ public class AdminControler{
 			@RequestParam("password") String password,
 			@RequestParam("course") String coursename,
 			@RequestParam("role") String role,
+			HttpSession http,
 			Model m1) {
 		coursename = coursename.trim();
 		Course selectedcourse = coursedb.findByCoursename(coursename).orElseThrow(() -> new RuntimeException("Course was not found:"));
+		Long userId = (Long) http.getAttribute("userId");
+		if (userId == null) {
+	        throw new RuntimeException("User ID not found in session.");
+	    }
+		
+		Users user = usersdb.findById(userId).orElseThrow(()->new RuntimeException("users not found"));
+		
+		Users newUser = new Users();
+		newUser.setUsername(userName);
+		newUser.setPassword(password);
+		newUser.setRole(role);
+		Users savedUser = usersdb.save(newUser);
 		
 		if(role.equals("Trainer")) {
 			Trainer trainer = new Trainer();
 			trainer.setCourse(selectedcourse);
 			trainer.setName(userName);
-			
-			Login login = new Login();
-			login.setUsername(userName);
-			login.setPassword(password);
-			login.setRole(role);
-			trainerservice.addinfo(userName, selectedcourse.getId());
+			trainer.setUser(savedUser);
+			trainerservice.addinfo(trainer);
 			
 		}
 		
 		else if (role.equals("Admin")) {
 			Admin admin = new Admin();
 			admin.setUsername(userName);
+			admin.setUser(savedUser);
 			
-			Login login = new Login();
-			login.setUsername(userName);
-			login.setPassword(password);
-			login.setRole(role);
-			
-			adminservice.addinfo(userName);
+			adminservice.addinfo(admin);
 		}
-		loginservice.addinfo(userName, password, role);
+		
 		return "success";
 	
 	}

@@ -13,11 +13,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.sample.entity.Course;
 import com.sample.entity.Students;
+import com.sample.entity.Users;
 import com.sample.repository.CourseDb;
 import com.sample.repository.Remo;
+import com.sample.repository.UsersDb;
+import com.sample.service.CourseService;
 import com.sample.service.StudentService;
 
 @Controller
@@ -31,40 +35,42 @@ public class Controler {
 	private CourseDb coursedb;
 	
 	@Autowired
+	private Remo studentsdb;
+	
+	@Autowired
 	private StudentService studentservice;
 	
-	@GetMapping("/studentlist")
-	public String studentlist(Model m1) {
-		List<Students> accptdstudents = studentRepository.findByStatus("accepted");
-		m1.addAttribute("students",accptdstudents);
-		return "studentlist";	}
+	@Autowired
+	private CourseService courseservice;
 	
+	@Autowired 
+	private UsersDb usersdb;
 	
-	public String showRegisterForm() {
-	    return "register"; // Returns the register.html (or register.jsp) form
+
+	
+	@GetMapping("/register")
+	public String showDropdown(Model m1) {
+		List<Course> course = courseservice.showDropdown();
+		m1.addAttribute("courses",course);
+		return "register";
+		
 	}
 	
-	
 	@PostMapping("/register")
-	@ResponseBody
 	private String Register(
 			@RequestParam("name") String name,
             @RequestParam("password") String password,
             @RequestParam("email") String email,
             @RequestParam("course") String coursename,
+            RedirectAttributes redirectAttributes,
 			Model m1) { 
 	coursename = coursename.trim();
 	Course selectedcourse = coursedb.findByCoursename(coursename).orElseThrow(() -> new RuntimeException("Course was not found:"));
-	// Create and populate the Students object
-    Students student = new Students();
-    student.setName(name);
-    student.setPassword(password);
-    student.setEmail(email);
-    student.setCourse(selectedcourse);
+	
+	Students savedStudent = studentservice.addinfo(name, password, email, coursename);
     
-    // Save the student object, including the course
-    studentservice.addinfo(name, password, email, selectedcourse.getId());
-	return "Success";
+    redirectAttributes.addFlashAttribute("registrationSuccess", "Registration Successful");
+    return "redirect:/register";
 	}
 
     // View list of students
@@ -80,7 +86,21 @@ public class Controler {
         if (student.isPresent()) {
             Students s = student.get();
             s.setStatus(status); // Update status to accepted or rejected
-            studentRepository.save(s);
+             Students st = studentRepository.save(s);
+             
+             
+             String newstatus = st.getStatus();
+             String name = st.getName();
+             String password = st.getPassword();
+             if (newstatus.contentEquals("accepted")) {
+            	    Users userNew = new Users();
+            		userNew.setUsername(name);
+            		userNew.setPassword(password);
+            		userNew.setRole("Trainee");
+            		Users savedUser = usersdb.save(userNew);
+            		st.setUser(savedUser);
+            		studentservice.addUserId(savedUser.getId(),st.getId());
+            	    }
 
             return ResponseEntity.ok("Status updated successfully");
         } else {
@@ -88,7 +108,10 @@ public class Controler {
 
         }
     }
-
-
-
+    
+    @GetMapping("/studentdashboard")
+    public String studentlogin(Model m1) {
+    	return "studentdashboard";
+    	
+    }
 }

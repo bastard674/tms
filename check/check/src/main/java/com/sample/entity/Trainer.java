@@ -8,9 +8,19 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.apache.catalina.User;
+
 @Entity
 @Table(name="trainer")
 public class Trainer {
+
+	public Users getUser() {
+		return user;
+	}
+
+	public void setUser(Users user) {
+		this.user = user;
+	}
 
 	public Long getId() {
 		return id;
@@ -59,6 +69,13 @@ public class Trainer {
 	@OneToOne
 	@JoinColumn(name="course_id")
 	private Course course;
+	
+	
+	@OneToOne
+    @JoinColumn(name = "user_id")  // Foreign key column in the Admin table
+    private Users user;
+    
+	
 	
 
 }

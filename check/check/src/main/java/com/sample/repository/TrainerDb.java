@@ -12,5 +12,6 @@ import com.sample.entity.Trainer;
 public interface TrainerDb extends JpaRepository<Trainer,Long>  {
 	 
 	Optional<Trainer> findByName(String username);
+	Optional<Trainer> findByUser_Id(Long userId);
 	 
 }
