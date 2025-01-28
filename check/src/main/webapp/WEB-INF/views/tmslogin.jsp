@@ -139,7 +139,7 @@
    
    <br>
         
-        <form action="/tmslogin" method="post">
+        <form id="loginForm" method="post">
             <div class="input-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required>
@@ -161,9 +161,23 @@
                     }
                 %>
             </div>
-            <button type="submit" class="login-button">Login</button>
-            <button type="submit" class="register-button">Register</button>
+            
+           <button type="submit" class="login-button" onclick="setFormAction('/tmslogin')">Login</button>
+           <button type="button" class="register-button" onclick="redirectToRegister()">Register</button>
         </form>
+        
+        <script>
+   
+    function setFormAction(action) {
+        const form = document.getElementById('loginForm');
+        form.action = action;
+    }
+
+ 
+    function redirectToRegister() {
+        window.location.href = 'register';
+    }
+</script>
  
 
    
