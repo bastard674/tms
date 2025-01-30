@@ -1,0 +1,83 @@
+package com.sample.controler;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+public class LoginController extends HttpServlet {
+    private static final String DB_URL = "jdbc:postgresql://localhost:5432/TMS";
+    private static final String DB_USER = "postgres";
+    private static final String DB_PASSWORD = "Rajesh@2326";
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+
+        // Validate credentials using the database
+        String role = validateUser(username, password);
+
+        if (role != null) {
+            // Set session attributes and redirect based on role
+            HttpSession session = request.getSession();
+            session.setAttribute("role", role);
+            session.setAttribute("username", username);
+
+            switch (role) {
+                case "admin":
+                    response.sendRedirect("adminDashboard.jsp");
+                    break;
+                case "trainer":
+                    response.sendRedirect("trainerDashboard.jsp");
+                    break;
+                case "trainee":
+                    response.sendRedirect("traineeLogin.jsp");
+                    break;
+                default:
+                    request.setAttribute("error", "Invalid role assigned.");
+                    request.getRequestDispatcher("homepage.jsp").forward(request, response);
+            }
+        } else {
+            request.setAttribute("error", "Invalid username or password.");
+            request.getRequestDispatcher("homepage.jsp").forward(request, response);
+        }
+    }
+
+    private String validateUser(String username, String password) {
+        String role = null;
+
+        try {
+            // Load the PostgreSQL driver
+            Class.forName("org.postgresql.Driver");
+
+            // Establish the connection
+            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+                // Prepare the query to fetch user credentials
+                String query = "SELECT role FROM users WHERE username = ? AND password = ?";
+                try (PreparedStatement statement = connection.prepareStatement(query)) {
+                    statement.setString(1, username);
+                    statement.setString(2, password);
+
+                    // Execute the query
+                    try (ResultSet resultSet = statement.executeQuery()) {
+                        if (resultSet.next()) {
+                            role = resultSet.getString("role"); // Fetch the role from the result set
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the error for debugging purposes
+        }
+
+        return role; // Returns the role if credentials are valid, otherwise null
+    }
+}
