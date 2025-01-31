@@ -1,0 +1,149 @@
+/* General Body Style */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 200px;
+    background-color: #333;
+    color: white;
+    padding-top: 20px;
+    position: fixed;
+    height: 100%;
+    top: 0;
+    left: 0;
+    text-align: center;
+}
+
+.sidebar h2 {
+    margin: 0;
+    padding-bottom: 20px;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin: 20px 0;
+}
+
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+/* Main Content Styles */
+.main-content {
+    margin-left: 220px; /* Add space for the sidebar */
+    width: calc(100% - 220px);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Top Bar Styles */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #0044cc;
+    color: white;
+    padding: 15px;
+    position: relative;
+}
+
+.topbar h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+/* "Add User" Button */
+#addUserButton {
+    background-color: #f1c40f;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#addUserButton:hover {
+    background-color: #f39c12;
+}
+
+/* Tables Layout */
+.tables {
+    margin-top: 30px;
+}
+
+/* Top Tables Layout */
+.top-tables {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Adds space between the first and second table */
+}
+
+.table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.table th, .table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.table th {
+    background-color: #f2f2f2;
+}
+
+/* Specific Table Widths */
+.table-20 {
+    width: 20%;
+}
+
+.table-80 {
+    width: 80%;
+}
+
+/* Bottom Table Layout */
+.bottom-table {
+    margin-top: 20px;
+}
+
+.bottom-table .table {
+    width: 100%;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .sidebar {
+        width: 150px;
+    }
+
+    .main-content {
+        margin-left: 160px;
+        width: calc(100% - 160px);
+    }
+
+    .topbar h1 {
+        font-size: 20px;
+    }
+
+    #addUserButton {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+}
